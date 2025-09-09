@@ -1,7 +1,10 @@
 package com.arka.notification_service.domain.model.entity;
 
+import com.arka.notification_service.domain.model.enums.NotificationChannel;
 import com.arka.notification_service.domain.model.valueobject.Email;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,7 +23,8 @@ public class User {
                 boolean prefersEmail, boolean prefersWhatsapp, boolean prefersSms, boolean prefersPush) {
 
         if (id == null) throw new IllegalArgumentException("ID cannot be null.");
-        if (name == null) throw new IllegalArgumentException("Name cannot be null.");
+        if (name == null || name.isBlank())
+            throw new IllegalArgumentException("Name cannot be null or blank.");
         if (email == null) throw new IllegalArgumentException("Email cannot be null.");
 
         this.id = id;
@@ -34,35 +38,46 @@ public class User {
     }
 
     public boolean canReceiveNotifications() {
-        return this.wantsNotifications;
+        return this.wantsNotifications && !getNotificationPreferences().isEmpty();
     }
 
     public boolean prefersEmailNotifications() {
-        return prefersEmail;
+        return this.prefersEmail;
     }
 
     public boolean prefersWhatsappNotifications() {
-        return prefersWhatsapp;
+        return this.prefersWhatsapp;
     }
 
     public boolean prefersSmsNotifications() {
-        return prefersSms;
+        return this.prefersSms;
     }
 
     public boolean prefersPushNotifications() {
-        return prefersPush;
+        return this.prefersPush;
+    }
+
+    public List<NotificationChannel> getNotificationPreferences() {
+        List<NotificationChannel> preferences = new ArrayList<>();
+
+        if (this.prefersEmail) preferences.add(NotificationChannel.EMAIL);
+        if (this.prefersWhatsapp) preferences.add(NotificationChannel.WHATSAPP);
+        if (this.prefersSms) preferences.add(NotificationChannel.SMS);
+        if (this.prefersPush) preferences.add(NotificationChannel.PUSH);
+
+        return preferences;
     }
 
     public UUID getId() {
-        return id;
+        return this.id;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public Email getEmail() {
-        return email;
+        return this.email;
     }
 
     @Override
@@ -70,25 +85,25 @@ public class User {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return id.equals(user.id);
+        return this.id.equals(user.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.id);
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email=" + email +
-                ", wantsNotifications=" + wantsNotifications +
-                ", prefersEmail=" + prefersEmail +
-                ", prefersWhatsapp=" + prefersWhatsapp +
-                ", prefersSms=" + prefersSms +
-                ", prefersPush=" + prefersPush +
+                "id=" + this.id +
+                ", name='" + this.name + '\'' +
+                ", email=" + this.email +
+                ", wantsNotifications=" + this.wantsNotifications +
+                ", prefersEmail=" + this.prefersEmail +
+                ", prefersWhatsapp=" + this.prefersWhatsapp +
+                ", prefersSms=" + this.prefersSms +
+                ", prefersPush=" + this.prefersPush +
                 '}';
     }
 }
