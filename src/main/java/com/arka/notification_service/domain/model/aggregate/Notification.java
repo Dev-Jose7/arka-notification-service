@@ -116,7 +116,7 @@ public class Notification {
                 this.errorMessage));
     }
 
-    public void retry() {
+    public void markAsRetry() {
         if (this.state != NotificationState.FAILED) {
             throw new IllegalStateException("Only failed notifications can be retried.");
         }
