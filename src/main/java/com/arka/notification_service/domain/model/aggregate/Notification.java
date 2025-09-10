@@ -19,8 +19,8 @@ public class Notification {
     private final NotificationId id;
     private final TemplateId templateId;
     private final User recipient;
-    private final String subject;
-    private final String body;
+    private final String renderedSubject;
+    private final String renderedBody;
     private final NotificationChannel channel;
     private NotificationState state;
     private int attempts;
@@ -32,16 +32,18 @@ public class Notification {
 
     private static final int MAX_RETRIES = 3;
 
-    public Notification(NotificationId id, TemplateId templateId, User recipient, String subject,
-                        String body, NotificationChannel channel, NotificationState state,
+    public Notification(NotificationId id, TemplateId templateId, User recipient, String renderedSubject,
+                        String renderedBody, NotificationChannel channel, NotificationState state,
                         int attempts, String errorMessage, LocalDateTime creationDate,
                         LocalDateTime sendDate, List<NotificationHistory> history) {
 
         if (id == null) throw new IllegalArgumentException("ID value cannot be null.");
         if (templateId == null) throw new IllegalArgumentException("Template ID value cannot be null.");
         if (recipient == null) throw new IllegalArgumentException("Recipient value cannot be null.");
-        if (subject == null) throw new IllegalArgumentException("Subject value cannot be null.");
-        if (body == null) throw new IllegalArgumentException("Body value cannot be null.");
+        if (renderedSubject == null || renderedSubject.isBlank())
+            throw new IllegalArgumentException("Subject value cannot be null.");
+        if (renderedBody == null || renderedBody.isBlank())
+            throw new IllegalArgumentException("Body value cannot be null.");
         if (channel == null) throw new IllegalArgumentException("Channel value cannot be null.");
         if (state == null) throw new IllegalArgumentException("State cannot be null.");
         if (attempts < 0) throw new IllegalArgumentException("Attempts cannot be negative.");
@@ -51,8 +53,8 @@ public class Notification {
         this.id = id;
         this.templateId = templateId;
         this.recipient = recipient;
-        this.subject = subject;
-        this.body = body;
+        this.renderedSubject = renderedSubject;
+        this.renderedBody = renderedBody;
         this.channel = channel;
         this.state = state;
         this.attempts = attempts;
@@ -63,9 +65,9 @@ public class Notification {
     }
 
     public Notification(NotificationId id, TemplateId templateId, User recipient,
-                        String subject, String body, NotificationChannel channel) {
+                        String renderedSubject, String renderedBody, NotificationChannel channel) {
 
-        this(id, templateId, recipient, subject, body, channel,
+        this(id, templateId, recipient, renderedSubject, renderedBody, channel,
                 NotificationState.PENDING, 0, null,
                 LocalDateTime.now(), null, new ArrayList<>());
     }
@@ -99,7 +101,7 @@ public class Notification {
                 this.id,
                 this.recipient.getId(),
                 this.channel,
-                this.body,
+                this.renderedBody,
                 this.sendDate));
     }
 
@@ -157,12 +159,12 @@ public class Notification {
         return recipient;
     }
 
-    public String getSubject() {
-        return subject;
+    public String getRenderedSubject() {
+        return renderedSubject;
     }
 
-    public String getBody() {
-        return body;
+    public String getRenderedBody() {
+        return renderedBody;
     }
 
     public NotificationChannel getChannel() {
@@ -212,7 +214,7 @@ public class Notification {
                 "id=" + id +
                 ", templateId=" + templateId +
                 ", recipient=" + recipient +
-                ", subject='" + subject + '\'' +
+                ", subject='" + renderedSubject + '\'' +
                 ", channel=" + channel +
                 ", state=" + state +
                 ", attempts=" + attempts +
